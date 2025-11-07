@@ -1,0 +1,91 @@
+################ Setup ####################
+
+units       lj
+atom_style  full
+
+bond_style  fene
+angle_style cosine
+pair_style  lj/cut 2.5
+
+read_data  		input_shifted.data #input.data #	final_traj.lmps #input.data #final_traj.lmps #
+
+bond_coeff      1 30.0 1.5 1.0 1.0
+special_bonds   fene
+
+angle_coeff     1 1.5
+
+pair_modify     shift yes
+pair_coeff      * * 1.0 1.0
+
+improper_style  none
+
+neighbor    1.0 bin
+neigh_modify every 1 delay 0 check no
+
+change_box      all triclinic
+
+
+#thermo          1000
+
+#Define time and rate paramters
+variable rate equal 0.000019
+variable xrate equal ${rate}/2.0
+timestep 0.01
+
+variable Ttot equal ceil(6.0/${rate}/dt)
+
+variable dint equal floor(0.1/${rate}/dt)
+
+variable thint equal ceil(0.01/${rate}/dt)
+
+variable Trem equal ${Ttot}-step
+variable time equal step*dt
+
+fix 1 all nvt/uef temp 1.0 1.0 10.0 erate -${xrate} -${xrate}
+fix 2 all momentum 100 linear 1 1 1
+
+compute	rmatrix all rotation/uefex
+
+
+variable pxx equal c_1_press[1]
+variable pyy equal c_1_press[2]
+variable pzz equal c_1_press[3]
+variable pxy equal c_1_press[4]
+variable pxz equal c_1_press[5]
+variable pyz equal c_1_press[6]
+variable eps equal ${rate}*v_time
+variable temp equal c_1_temp
+variable epair equal epair
+variable emol equal emol
+variable etot equal etotal
+
+
+
+#fix state_out all ave/time 1 ${thint} ${thint} v_eps v_temp v_epair v_emol v_etot v_pxx v_pyy v_pzz v_pxy v_pxz v_pyz ave one file extension.out
+
+thermo ${thint} 
+thermo_style    custom step v_eps v_temp epair emol etotal c_1_press[*] c_rmatrix[*]
+thermo_modify   norm no
+
+
+variable freq string 20000
+#fix a1 all ave/time ${freq} 1 ${freq} v_pxx v_pyy v_pzz v_pxy v_pxz v_pyz file press.txt
+
+
+fix rot all ave/time 1 1 ${thint}  c_rmatrix[*] file rotation.txt
+
+fix state_out all ave/time 1 ${thint} ${thint} v_eps v_temp v_epair v_emol v_etot v_pxx v_pyy v_pzz v_pxy v_pxz v_pyz ave one file extension.out
+
+
+dump d2 all custom ${thint} dump.lammps-frame.lammpstrj id mol type xu yu zu #vx vy vz ix iy iz #fx fy fz
+dump_modify d2 sort id
+dump_modify d2 pbc yes
+
+restart 1048576 imers.restart
+
+################# Run length for Hencky strain = 6 ##################
+variable steps equal ceil(6.0/(rate*dt))
+#print "Target Hencky strain = 6.0 at erate = ${rate}; running ${step} steps."
+run ${Trem}
+
+write_data final.data
