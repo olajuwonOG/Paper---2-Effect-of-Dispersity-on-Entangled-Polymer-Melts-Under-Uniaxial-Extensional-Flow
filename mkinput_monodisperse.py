@@ -30,7 +30,6 @@ nxbeads = 3       #number of beads in the x segment of only backbone, to be rand
 x_y = 0     #ratio of uncharged x segments per regular 'y' segments with charged monomers
 nmonomersperpoly = 140 #4 before      # total (including x) number of monomers in polymer chain (I guess)
 npoly =  1000    #1000 number of polymers chains in total
-minsep = 1.0                # allowed separation in overlap check
 cisize = 0.5                #counterion diameter/bead diameter; to adjust density
 z_c = 1                   # counterion valence
 dens = 0.85               # bead density
