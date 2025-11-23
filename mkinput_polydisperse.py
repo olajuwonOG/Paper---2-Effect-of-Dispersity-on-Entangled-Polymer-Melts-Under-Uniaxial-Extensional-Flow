@@ -36,7 +36,7 @@ from datetime import datetime
 
 
 
-def generateInputFile(nbeadsInput, monomers_per_polymer_input, npoly_input, minsep_input, dens_input, bond_length_input, filename, nmin, nmax):
+def generateInputFile(nbeadsInput, monomers_per_polymer_input, npoly_input,  dens_input, bond_length_input, filename, nmin, nmax):
     class Schulz_Zimm(rv_continuous):
         def _pdf(self, x, z, Mn):
             #return (x**(alpha - 1) * np.exp(-x / beta)) / (beta**alpha * np.math.gamma(alpha))
@@ -154,7 +154,6 @@ def generateInputFile(nbeadsInput, monomers_per_polymer_input, npoly_input, mins
         if not polydispersity:
             monomers_per_polymer = monomers_per_polymer_input  # monomers in polymer (including x)
         npoly = npoly_input  # number of polymers
-        minsep = minsep_input  # minimum seperation to prevent overlap
         # pendant_size = 1.0  # pendant group diameter/bead diameter
         dens = dens_input  # bead density
         bond_length = bond_length_input  # bond length
@@ -163,24 +162,19 @@ def generateInputFile(nbeadsInput, monomers_per_polymer_input, npoly_input, mins
         print("no input params or incorrect params (7 fields)")
         print(
             "fields are:\nbeads per monomer (mainchain only)\nmonomers per polymer\nnumber of polymers\nminimum "
-            "seperation to prevent overlap\nbead density\nbond length\nprobability of end of side branch")
         nbeads = 5  # beads per monomer mainchain
         #monomers_per_polymer = 3  # monomers in polymer (including x)
         npoly = 3  # number of polymers
-        minsep = 1.0  # minimum seperation to prevent overlap
         # pendant_size = 1.0  # pendant group diameter/bead diameter
         dens = 0.85  # bead density
         bond_length = 0.97  # bond length
         p_branch_end = 0.5
-    minsep2 = minsep ** 2
-    print(minsep2)
     print("beads per monomer: ", nbeads)
     # print("number of beads in x segement of only backbone: ", nxbeads)
     #print("monomers per polymer: ", monomers_per_polymer)
     print("Maximum chain length is", max(monomers_per_polymer))
     print("Minimum chain length is", min(monomers_per_polymer))
     print("number of polymers: ", npoly)
-    print("minimum seperation ", minsep)
     # print("pendant size: ", pendant_size)
     print("bead density: ", dens)
 
